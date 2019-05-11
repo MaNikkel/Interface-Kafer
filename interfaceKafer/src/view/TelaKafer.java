@@ -2,19 +2,17 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+
+    KAFER INTERFACE - 2019
  */
 package view;
 
 import arduino.*;
 import com.fazecast.jSerialComm.SerialPort;
-import connection.ConnectionFactory;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import javax.swing.table.DefaultTableModel;
 import model.bean.DadosKafer;
 import model.dao.DadosDAO;
-
 
 /**
  *
@@ -26,79 +24,76 @@ public class TelaKafer extends javax.swing.JFrame {
     /**
      * Creates new form TelaKafer
      */
-    
+
     public SerialPort porta;
     public static String tabela;
     public static DadosKafer dados = new DadosKafer();
-    
+
     public TelaKafer() {
         initComponents();
         //carregarPortas();
         lblConnect.setVisible(false);
-        
-        
-        
+
     }
-    
-    public  Runnable t1 = new Runnable(){
-        public void run(){
-            while(true){
+
+    public Runnable t1 = new Runnable() {
+        public void run() {
+            while (true) {
                 //System.out.println(kafer.serialRead(2));
-              
+
                 String leitura = kafer.serialRead();
-              
+
                 char[] leitura2 = leitura.toCharArray();
                 int cont = 0;
                 int k = 0;
-                for(int i = 0; i < leitura.length(); i++){
-                    if(leitura2[i] == '\n'){
-                       if(cont == 0) {
-                           dados.setErro(leitura.subSequence(k, i).toString());
-                           System.out.println("erro " + dados.getErro());
-                          
-                       }
-                       if(cont == 1) {
-                           dados.setKd(leitura.subSequence(k, i).toString());
-                           System.out.println("Kd " + dados.getKd());
-                       }
-                       if(cont == 2) {
-                           dados.setKi(leitura.subSequence(k, i).toString());
-                           System.out.println("Ki " + dados.getKi());
-                       }
-                       if(cont == 3) {
-                           dados.setKp(leitura.subSequence(k, i).toString());
-                           System.out.println("Kp " + dados.getKp());
-                       }
-                       if(cont == 4) {
-                           dados.setMillis(leitura.subSequence(k, i).toString());
-                           System.out.println("millis " + dados.getMillis());
-                       }
-                       cont++;
-                       if(cont == 5) {
-                           cont = 0;
-                           DadosDAO dbDados = new DadosDAO();
-                           dbDados.create(dados); 
-                           
-                           readJTable();
-                       }
-                       k = i+1;    
+                for (int i = 0; i < leitura.length(); i++) {
+                    if (leitura2[i] == '\n') {
+                        if (cont == 0) {
+                            dados.setErro(leitura.subSequence(k, i).toString());
+                            System.out.println("erro " + dados.getErro());
+
+                        }
+                        if (cont == 1) {
+                            dados.setKd(leitura.subSequence(k, i).toString());
+                            System.out.println("Kd " + dados.getKd());
+                        }
+                        if (cont == 2) {
+                            dados.setKi(leitura.subSequence(k, i).toString());
+                            System.out.println("Ki " + dados.getKi());
+                        }
+                        if (cont == 3) {
+                            dados.setKp(leitura.subSequence(k, i).toString());
+                            System.out.println("Kp " + dados.getKp());
+                        }
+                        if (cont == 4) {
+                            dados.setMillis(leitura.subSequence(k, i).toString());
+                            System.out.println("millis " + dados.getMillis());
+                        }
+                        cont++;
+                        if (cont == 5) {
+                            cont = 0;
+                            DadosDAO dbDados = new DadosDAO();
+                            dbDados.create(dados);
+
+                            readJTable();
+                        }
+                        k = i + 1;
                     }
                 }
-                
+
             }
-            
+
         }
     };
-    
+
     //DefaultTableModel modelo = (DefaultTableModel) jtDados.getModel();
     //modelo = (DefaultTableModel) jtDados.getModel();
-    
-    public void readJTable(){
-        
+    public void readJTable() {
+
         DefaultTableModel modelo = (DefaultTableModel) jtDados.getModel();
         modelo.setRowCount(0);
         DadosDAO ddao = new DadosDAO();
-        for(DadosKafer k: ddao.ler()){
+        for (DadosKafer k : ddao.ler()) {
             System.out.println(k.getErro());
             modelo.addRow(new Object[]{
                 k.getMillis(),
@@ -106,11 +101,12 @@ public class TelaKafer extends javax.swing.JFrame {
                 k.getKp(),
                 k.getKi(),
                 k.getKd()
-                
+
             });
         }
-        
+
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -303,18 +299,15 @@ public class TelaKafer extends javax.swing.JFrame {
             default:
                 break;
         }
-        if(btnConnect.getText().equals("Conectar"))
-        { 
-            
-            if(!cbPort.getSelectedItem().toString().isEmpty())
-            {
-                
+        if (btnConnect.getText().equals("Conectar")) {
+
+            if (!cbPort.getSelectedItem().toString().isEmpty()) {
+
                 //porta = SerialPort.getCommPort(cbPort.getSelectedItem().toString());
                 kafer = new Arduino(cbPort.getSelectedItem().toString(), 9600);
                 //kafer.setPortDescription(cbPort.getSelectedItem().toString());
-                
-                if(kafer.openConnection())
-                {
+
+                if (kafer.openConnection()) {
                     cbPort.setEnabled(false);
                     cbController.setEnabled(false);
                     lblConnect.setVisible(true);
@@ -323,13 +316,12 @@ public class TelaKafer extends javax.swing.JFrame {
                     DadosDAO d = new DadosDAO();
                     d.del();
                     new Thread(t1).start();
-                    
-                    
+
                 }
-            } else{
+            } else {
                 System.err.println("erro");
-            }           
-         }else{           
+            }
+        } else {
             kafer.closeConnection();
             cbPort.setEnabled(true);
             cbController.setEnabled(true);
@@ -338,74 +330,70 @@ public class TelaKafer extends javax.swing.JFrame {
             carregarPortas();
             //readJTable();
         }
-        
+
     }//GEN-LAST:event_btnConnectActionPerformed
 
     private void cbPortMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cbPortMouseClicked
         // TODO add your handling code here:
         carregarPortas();
-        
+
     }//GEN-LAST:event_cbPortMouseClicked
 
     private void formMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseEntered
-        
 
-        
     }//GEN-LAST:event_formMouseEntered
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_formWindowActivated
 
     private void jtDadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtDadosMouseClicked
         // TODO add your handling code here:
-        if(evt.getButton() == MouseEvent.BUTTON3){
+        if (evt.getButton() == MouseEvent.BUTTON3) {
             System.out.println("botão");
         }
         System.out.println("botão");
-        
+
     }//GEN-LAST:event_jtDadosMouseClicked
 
     private void jPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseClicked
-        if(evt.getButton() == MouseEvent.BUTTON3){
+        if (evt.getButton() == MouseEvent.BUTTON3) {
             System.out.println("botão");
         }
     }//GEN-LAST:event_jPanel1MouseClicked
 
     private void jPanel2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel2MousePressed
-        if(evt.getButton() == MouseEvent.BUTTON3){
+        if (evt.getButton() == MouseEvent.BUTTON3) {
             System.out.println("botão");
         }
     }//GEN-LAST:event_jPanel2MousePressed
 
     private void jtDadosMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtDadosMousePressed
-        if(evt.getButton() == MouseEvent.BUTTON3){
+        if (evt.getButton() == MouseEvent.BUTTON3) {
             System.out.println("botão");
         }
     }//GEN-LAST:event_jtDadosMousePressed
 
-     public void carregarPortas(){
-         SerialPort[] portNames = SerialPort.getCommPorts();
-         cbPort.removeAllItems();
-         for(SerialPort portName:portNames){
+    public void carregarPortas() {
+        SerialPort[] portNames = SerialPort.getCommPorts();
+        cbPort.removeAllItems();
+        for (SerialPort portName : portNames) {
             cbPort.addItem(portName.getSystemPortName());
-         }
-           
-     }
+        }
+
+    }
+
     /**
      * @param args the command line arguments
      */
-    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
-        
-        
-        
+
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -417,19 +405,14 @@ public class TelaKafer extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(TelaKafer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         //</editor-fold>
-        
-       
         //readJTable();
-        
-        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new TelaKafer().setVisible(true);
         });
-        
-       
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
