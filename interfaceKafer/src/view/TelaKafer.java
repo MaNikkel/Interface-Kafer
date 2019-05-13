@@ -227,7 +227,7 @@ public class TelaKafer extends javax.swing.JFrame {
 
             },
             new String [] {
-                "MILLIS", "ERRO", "Kp", "Kd", "Ki"
+                "ERRO", "Kp", "Kd", "Ki", "MILLIS"
             }
         ));
         jtDados.addMouseListener(new java.awt.event.MouseAdapter() {
